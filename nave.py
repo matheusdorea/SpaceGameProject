@@ -45,17 +45,17 @@ class Nave:
 
     def mover_frente(self):
         a = radians(self.angulo)
-        dx = -sin(a) * self.VELOCIDADE
-        dy = -cos(a) * self.VELOCIDADE
+        dx = sin(a) * self.VELOCIDADE
+        dy = cos(a) * self.VELOCIDADE
         self.x = (self.x + dx) % LARGURA   # wrap de tela
-        self.y = (self.y + dy) % ALTURA
+        self.y = (self.y - dy) % ALTURA
 
     def mover_tras(self):
         a = radians(self.angulo)
-        dx = sin(a) * self.VELOCIDADE
-        dy = cos(a) * self.VELOCIDADE
+        dx = -sin(a) * self.VELOCIDADE
+        dy = -cos(a) * self.VELOCIDADE
         self.x = (self.x + dx) % LARGURA
-        self.y = (self.y + dy) % ALTURA
+        self.y = (self.y - dy) % ALTURA
 
 
     def desenhar(self, superficie):
