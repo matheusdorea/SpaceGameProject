@@ -6,6 +6,7 @@ from coresEnum import Cores
 from estadosEnum import Estados
 from nave import Nave
 from naveInimiga import NaveInimiga
+from projetil import Projetil
 
 # ============================================================
 # CONFIGURAÇÕES GLOBAIS
@@ -66,14 +67,23 @@ def main():
         if estado == Estados.ESTADO_JOGANDO:
             nave.atualizar()
 
-            for i in inimigos:
-                i.atualizar(nave.x, nave.y)
+
 
             for p in projeteis[:]:
                 p.atualizar()
                 if p.fora_da_tela():
                     projeteis.remove(p)
                     continue
+
+                #colisão de projétil com inimigo
+                for inimigo in inimigos[:]:
+                    if inimigo.viva and inimigo.colidiu_com(p.x, p.y):
+                        inimigos.remove(inimigo)
+                        projeteis.remove(p)
+                        break
+
+            for i in inimigos:
+                i.atualizar(nave.x, nave.y)
 
         # --------- DESENHANDO NA TELA ----------
         if estado == Estados.ESTADO_JOGANDO:
