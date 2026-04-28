@@ -4,6 +4,7 @@ from sys import exit
 from config import ALTURA, LARGURA
 from coresEnum import Cores
 from estadosEnum import Estados
+from hud import desenhar_hud
 from nave import Nave
 from naveInimiga import NaveInimiga
 from projetil import Projetil
@@ -17,8 +18,12 @@ pygame.init()
 TELA = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Space Defender")
 
+#definindo fps
 clock = pygame.time.Clock()
 FPS = 60
+
+#definindo fonte
+fonte_hub = pygame.font.SysFont(None, 30)
 
 #Criação de objetos
 def criar_jogo():
@@ -67,8 +72,6 @@ def main():
         if estado == Estados.ESTADO_JOGANDO:
             nave.atualizar()
 
-
-
             for p in projeteis[:]:
                 p.atualizar()
                 if p.fora_da_tela():
@@ -82,19 +85,26 @@ def main():
                         projeteis.remove(p)
                         break
 
-            for i in inimigos:
-                i.atualizar(nave.x, nave.y)
+            for inimigo in inimigos[:]:
+                inimigo.atualizar(nave.x, nave.y)
+
+                if inimigo.viva and nave.colidiu_com(inimigo.x, inimigo.y):
+                    nave.vidas -= 1
+                    inimigos.remove(inimigo)
+                    break
 
         # --------- DESENHANDO NA TELA ----------
         if estado == Estados.ESTADO_JOGANDO:
             TELA.fill(Cores.PRETO)
 
-            nave.desenhar(TELA)
             for p in projeteis:
                 p.desenhar(TELA)
             for i in inimigos:
                 i.desenhar(TELA)
 
+            nave.desenhar(TELA)
+                
+            desenhar_hud(fonte_hub, TELA, nave)
             pygame.display.flip()
 
 if __name__ == "__main__":

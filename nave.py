@@ -68,6 +68,9 @@ class Nave:
         if self._cooldown > 0:
             self._cooldown -= 1
 
+    def colidiu_com(self, outro_x, outro_y, raio = 20):
+        dist = ((self.x - outro_x)**2 + (self.y - outro_y)**2) ** 0.5
+        return dist < raio
 
     def desenhar(self, superficie):
         pontos = self._pontos_transformados()
