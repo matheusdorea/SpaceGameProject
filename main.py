@@ -21,13 +21,14 @@ FPS = 60
 #Criação de objetos
 def criar_jogo():
     nave = Nave(LARGURA // 2, ALTURA // 2)
+    projeteis = []
 
-    return nave
+    return nave, projeteis
 
 # GameLoop
 def main():
     # Definindo Objetos
-    nave = criar_jogo()
+    nave, projeteis = criar_jogo()
 
     # Definindo estado inicial do jogo
     estado = Estados.ESTADO_JOGANDO
@@ -52,12 +53,28 @@ def main():
                 nave.girar(-1)
             if teclas[K_d] or teclas[K_RIGHT]:
                 nave.girar(+1)
+            if teclas[K_SPACE]:
+                tiro = nave.atirar()
+                if tiro:
+                    projeteis.append(tiro)
+
+        # --------- ATUALIZANDO ----------------
+        if estado == Estados.ESTADO_JOGANDO:
+            nave.atualizar()
+
+            for p in projeteis[:]:
+                p.atualizar()
+                if p.fora_da_tela():
+                    projeteis.remove(p)
+                    continue
 
         # --------- DESENHANDO NA TELA ----------
         if estado == Estados.ESTADO_JOGANDO:
             TELA.fill(Cores.PRETO)
 
             nave.desenhar(TELA)
+            for p in projeteis:
+                p.desenhar(TELA)
 
             pygame.display.flip()
 

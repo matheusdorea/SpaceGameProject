@@ -1,6 +1,7 @@
 from coresEnum import Cores
 from formasEnum import Formas
 from config import ALTURA, LARGURA, desenhar_poligono
+from projetil import Projetil
 from transformacoes import *
 
 
@@ -57,7 +58,17 @@ class Nave:
         self.x = (self.x + dx) % LARGURA
         self.y = (self.y - dy) % ALTURA
 
+    def atirar(self):
+        if self._cooldown <= 0:
+            self._cooldown = self.COOLDOWN_TIRO
+            return Projetil(self.x, self.y, self.angulo)
+        return None
+    
+    def atualizar(self):
+        if self._cooldown > 0:
+            self._cooldown -= 1
+
 
     def desenhar(self, superficie):
         pontos = self._pontos_transformados()
-        desenhar_poligono(superficie, Cores.CIANO, pontos)
+        desenhar_poligono(superficie, Cores.BRANCO, pontos)
