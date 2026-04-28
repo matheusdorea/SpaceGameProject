@@ -5,6 +5,7 @@ from config import ALTURA, LARGURA
 from coresEnum import Cores
 from estadosEnum import Estados
 from nave import Nave
+from naveInimiga import NaveInimiga
 
 # ============================================================
 # CONFIGURAÇÕES GLOBAIS
@@ -21,14 +22,17 @@ FPS = 60
 #Criação de objetos
 def criar_jogo():
     nave = Nave(LARGURA // 2, ALTURA // 2)
+    inimigos = [
+        NaveInimiga(100, 100)
+    ]
     projeteis = []
 
-    return nave, projeteis
+    return nave, inimigos, projeteis
 
 # GameLoop
 def main():
     # Definindo Objetos
-    nave, projeteis = criar_jogo()
+    nave, inimigos, projeteis = criar_jogo()
 
     # Definindo estado inicial do jogo
     estado = Estados.ESTADO_JOGANDO
@@ -62,6 +66,9 @@ def main():
         if estado == Estados.ESTADO_JOGANDO:
             nave.atualizar()
 
+            for i in inimigos:
+                i.atualizar(nave.x, nave.y)
+
             for p in projeteis[:]:
                 p.atualizar()
                 if p.fora_da_tela():
@@ -75,6 +82,8 @@ def main():
             nave.desenhar(TELA)
             for p in projeteis:
                 p.desenhar(TELA)
+            for i in inimigos:
+                i.desenhar(TELA)
 
             pygame.display.flip()
 
