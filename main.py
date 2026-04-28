@@ -7,6 +7,7 @@ from estadosEnum import Estados
 from hud import desenhar_hud
 from nave import Nave
 from naveInimiga import NaveInimiga
+from naveMae import NaveMae
 from projetil import Projetil
 
 # ============================================================
@@ -28,17 +29,16 @@ fonte_hub = pygame.font.SysFont(None, 30)
 #Criação de objetos
 def criar_jogo():
     nave = Nave(LARGURA // 2, ALTURA // 2)
-    inimigos = [
-        NaveInimiga(100, 100)
-    ]
+    inimigos = []
+    nave_mae = NaveMae(LARGURA // 2, 100)
     projeteis = []
 
-    return nave, inimigos, projeteis
+    return nave, inimigos, nave_mae, projeteis
 
 # GameLoop
 def main():
     # Definindo Objetos
-    nave, inimigos, projeteis = criar_jogo()
+    nave, inimigos, nave_mae, projeteis = criar_jogo()
 
     # Definindo estado inicial do jogo
     estado = Estados.ESTADO_JOGANDO
@@ -93,6 +93,11 @@ def main():
                     inimigos.remove(inimigo)
                     break
 
+            nave_mae.atualizar()
+            if nave_mae.novo_inimigo:
+                inimigos.append(NaveInimiga(nave_mae.x, nave_mae.y))
+                nave_mae.novo_inimigo = False
+
         # --------- DESENHANDO NA TELA ----------
         if estado == Estados.ESTADO_JOGANDO:
             TELA.fill(Cores.PRETO)
@@ -101,6 +106,8 @@ def main():
                 p.desenhar(TELA)
             for i in inimigos:
                 i.desenhar(TELA)
+
+            nave_mae.desenhar(TELA)
 
             nave.desenhar(TELA)
                 
