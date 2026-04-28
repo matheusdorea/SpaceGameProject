@@ -29,6 +29,10 @@ class NaveInimiga:
         self.x += -sin(a) * self.VELOCIDADE
         self.y +=  cos(a) * self.VELOCIDADE
 
+    def colidiu_com(self, outro_x, outro_y, raio = 20):
+        dist = ((self.x - outro_x)**2 + (self.y - outro_y)**2) ** 0.5
+        return dist < raio
+
     def desenhar(self, superficie):
         pontos = self.pontos_transformados()
         desenhar_poligono(superficie, Cores.VERMELHO, pontos)
