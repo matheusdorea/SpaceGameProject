@@ -8,7 +8,7 @@ from hud import desenhar_hud
 from nave import Nave
 from naveInimiga import NaveInimiga
 from naveMae import NaveMae
-from projetil import Projetil
+from gameOver import *
 
 # ============================================================
 # CONFIGURAÇÕES GLOBAIS
@@ -52,9 +52,9 @@ def main():
                 pygame.quit()
                 exit()
             if event.type == KEYDOWN:
-                #retirar
-                if event.key == K_r and Estados.ESTADO_JOGANDO:
-                    nave.refletida= not nave.refletida
+                if event.key == K_r and estado != Estados.ESTADO_JOGANDO:
+                    nave, inimigos, nave_mae, projeteis = criar_jogo()
+                    estado = Estados.ESTADO_JOGANDO
 
         # ---------- INPUT CONTÍNUO ----------
         if estado == Estados.ESTADO_JOGANDO:
@@ -109,6 +109,12 @@ def main():
                 inimigos.append(NaveInimiga(nave_mae.x, nave_mae.y))
                 nave_mae.novo_inimigo = False
 
+            # Condições
+            if not nave_mae.viva:
+                estado = Estados.ESTADO_VITORIA
+            if nave.vidas <= 0:
+                estado = Estados.ESTADO_DERROTA
+
         # --------- DESENHANDO NA TELA ----------
         if estado == Estados.ESTADO_JOGANDO:
             TELA.fill(Cores.PRETO)
@@ -124,6 +130,12 @@ def main():
                 
             desenhar_hud(fonte_hub, TELA, nave)
             pygame.display.flip()
+        
+        elif estado == Estados.ESTADO_VITORIA:
+            tela_fim(TELA, "VOCÊ VENCEU!", Cores.VERDE)
+        elif estado == Estados.ESTADO_DERROTA:
+            tela_fim(TELA, "GAME OVER", Cores.VERMELHO)
+            
 
 if __name__ == "__main__":
     main()
