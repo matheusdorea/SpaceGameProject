@@ -5,6 +5,8 @@ from config import ALTURA, LARGURA
 from coresEnum import Cores
 from estadosEnum import Estados
 from nave import Nave
+from naveInimiga import NaveInimiga
+from projetil import Projetil
 
 # ============================================================
 # CONFIGURAÇÕES GLOBAIS
@@ -21,13 +23,17 @@ FPS = 60
 #Criação de objetos
 def criar_jogo():
     nave = Nave(LARGURA // 2, ALTURA // 2)
+    inimigos = [
+        NaveInimiga(100, 100)
+    ]
+    projeteis = []
 
-    return nave
+    return nave, inimigos, projeteis
 
 # GameLoop
 def main():
     # Definindo Objetos
-    nave = criar_jogo()
+    nave, inimigos, projeteis = criar_jogo()
 
     # Definindo estado inicial do jogo
     estado = Estados.ESTADO_JOGANDO
@@ -56,12 +62,42 @@ def main():
                 nave.girar(-1)
             if teclas[K_d] or teclas[K_RIGHT]:
                 nave.girar(+1)
+            if teclas[K_SPACE]:
+                tiro = nave.atirar()
+                if tiro:
+                    projeteis.append(tiro)
+
+        # --------- ATUALIZANDO ----------------
+        if estado == Estados.ESTADO_JOGANDO:
+            nave.atualizar()
+
+
+
+            for p in projeteis[:]:
+                p.atualizar()
+                if p.fora_da_tela():
+                    projeteis.remove(p)
+                    continue
+
+                #colisão de projétil com inimigo
+                for inimigo in inimigos[:]:
+                    if inimigo.viva and inimigo.colidiu_com(p.x, p.y):
+                        inimigos.remove(inimigo)
+                        projeteis.remove(p)
+                        break
+
+            for i in inimigos:
+                i.atualizar(nave.x, nave.y)
 
         # --------- DESENHANDO NA TELA ----------
         if estado == Estados.ESTADO_JOGANDO:
             TELA.fill(Cores.PRETO)
 
             nave.desenhar(TELA)
+            for p in projeteis:
+                p.desenhar(TELA)
+            for i in inimigos:
+                i.desenhar(TELA)
 
             pygame.display.flip()
 
