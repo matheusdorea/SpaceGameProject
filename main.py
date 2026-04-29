@@ -40,6 +40,10 @@ def main():
             if event.type == QUIT:
                 pygame.quit()
                 exit()
+            if event.type == KEYDOWN:
+                #retirar
+                if event.key == K_r and Estados.ESTADO_JOGANDO:
+                    nave.refletida= not nave.refletida
 
         # ---------- INPUT CONTÍNUO ----------
         if estado == Estados.ESTADO_JOGANDO:
