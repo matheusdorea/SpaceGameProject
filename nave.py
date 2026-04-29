@@ -1,0 +1,79 @@
+from coresEnum import Cores
+from formasEnum import Formas
+from config import ALTURA, LARGURA, desenhar_poligono
+from projetil import Projetil
+from transformacoes import *
+
+
+class Nave:
+    """Nave controlada pelo jogador."""
+    VELOCIDADE     = 4
+    VEL_ROTACAO    = 4    # graus por frame
+    COOLDOWN_TIRO  = 20   # frames entre tiros
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.angulo = 0
+        self.escala = 1.0
+        self.vidas = 3
+        self._cooldown = 0
+        self.refletida = False
+
+    # ------ transformações ------
+
+    def _pontos_transformados(self):
+        """
+        Pipeline de transformação:
+          1. Escala
+          2. Rotação
+          3. Reflexão (opcional)
+          4. Translação para posição mundial
+        """
+        M_escala   = matriz_escala(self.escala, self.escala)
+        M_rotacao  = matriz_rotacao(self.angulo)
+        M_reflexao = matriz_reflexao("y") @ matriz_reflexao("x") if self.refletida else np.eye(3)
+        M_trans    = matriz_translacao(self.x, self.y)
+
+        # Composição: aplica da direita para a esquerda
+        M = M_trans @ M_reflexao @ M_rotacao @ M_escala
+
+        return aplicar_transformacao(Formas.FORMA_NAVE, M)
+    
+    def girar(self, direcao):
+        """direcao: +1 (horário) ou -1 (anti-horário)."""
+        self.angulo += direcao * self.VEL_ROTACAO
+
+    def mover_frente(self):
+        a = radians(self.angulo)
+        dx = sin(a) * self.VELOCIDADE
+        dy = cos(a) * self.VELOCIDADE
+        self.x = (self.x + dx) % LARGURA   # wrap de tela
+        self.y = (self.y - dy) % ALTURA
+        self.refletida = False
+
+    def mover_tras(self):
+        a = radians(self.angulo)
+        dx = -sin(a) * self.VELOCIDADE
+        dy = -cos(a) * self.VELOCIDADE
+        self.x = (self.x + dx) % LARGURA
+        self.y = (self.y - dy) % ALTURA
+        self.refletida = True
+
+    def atirar(self):
+        if self._cooldown <= 0:
+            self._cooldown = self.COOLDOWN_TIRO
+            return Projetil(self.x, self.y, self.angulo)
+        return None
+    
+    def atualizar(self):
+        if self._cooldown > 0:
+            self._cooldown -= 1
+
+    def colidiu_com(self, outro_x, outro_y, raio = 20):
+        dist = ((self.x - outro_x)**2 + (self.y - outro_y)**2) ** 0.5
+        return dist < raio
+
+    def desenhar(self, superficie):
+        pontos = self._pontos_transformados()
+        desenhar_poligono(superficie, Cores.BRANCO, pontos)
