@@ -4,8 +4,10 @@ from sys import exit
 from config import ALTURA, LARGURA
 from coresEnum import Cores
 from estadosEnum import Estados
+from hud import desenhar_hud
 from nave import Nave
 from naveInimiga import NaveInimiga
+from naveMae import NaveMae
 from projetil import Projetil
 
 # ============================================================
@@ -17,23 +19,26 @@ pygame.init()
 TELA = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Space Defender")
 
+#definindo fps
 clock = pygame.time.Clock()
 FPS = 60
+
+#definindo fonte
+fonte_hub = pygame.font.SysFont(None, 30)
 
 #Criação de objetos
 def criar_jogo():
     nave = Nave(LARGURA // 2, ALTURA // 2)
-    inimigos = [
-        NaveInimiga(100, 100)
-    ]
+    inimigos = []
+    nave_mae = NaveMae(LARGURA // 2, 100)
     projeteis = []
 
-    return nave, inimigos, projeteis
+    return nave, inimigos, nave_mae, projeteis
 
 # GameLoop
 def main():
     # Definindo Objetos
-    nave, inimigos, projeteis = criar_jogo()
+    nave, inimigos, nave_mae, projeteis = criar_jogo()
 
     # Definindo estado inicial do jogo
     estado = Estados.ESTADO_JOGANDO
@@ -67,11 +72,15 @@ def main():
         if estado == Estados.ESTADO_JOGANDO:
             nave.atualizar()
 
-
-
             for p in projeteis[:]:
                 p.atualizar()
                 if p.fora_da_tela():
+                    projeteis.remove(p)
+                    continue
+                
+                # colisão de projetil com nave mae
+                if nave_mae.viva and nave_mae.colidiu_com(p.x, p.y):
+                    nave_mae.receber_dano()
                     projeteis.remove(p)
                     continue
 
@@ -82,19 +91,34 @@ def main():
                         projeteis.remove(p)
                         break
 
-            for i in inimigos:
-                i.atualizar(nave.x, nave.y)
+            for inimigo in inimigos[:]:
+                inimigo.atualizar(nave.x, nave.y)
+
+                if inimigo.viva and nave.colidiu_com(inimigo.x, inimigo.y):
+                    nave.vidas -= 1
+                    inimigos.remove(inimigo)
+                    break
+            
+            # Nave mãe produz inimigos
+            nave_mae.atualizar()
+            if nave_mae.novo_inimigo:
+                inimigos.append(NaveInimiga(nave_mae.x, nave_mae.y))
+                nave_mae.novo_inimigo = False
 
         # --------- DESENHANDO NA TELA ----------
         if estado == Estados.ESTADO_JOGANDO:
             TELA.fill(Cores.PRETO)
 
-            nave.desenhar(TELA)
             for p in projeteis:
                 p.desenhar(TELA)
             for i in inimigos:
                 i.desenhar(TELA)
 
+            nave_mae.desenhar(TELA)
+
+            nave.desenhar(TELA)
+                
+            desenhar_hud(fonte_hub, TELA, nave)
             pygame.display.flip()
 
 if __name__ == "__main__":
