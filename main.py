@@ -9,6 +9,7 @@ from nave import Nave
 from naveInimiga import NaveInimiga
 from naveMae import NaveMae
 from gameOver import *
+from estrelas import SistemaDEstrelas
 
 # ============================================================
 # CONFIGURAÇÕES GLOBAIS
@@ -32,13 +33,13 @@ def criar_jogo():
     inimigos = []
     nave_mae = NaveMae(LARGURA // 2, 100)
     projeteis = []
-
-    return nave, inimigos, nave_mae, projeteis
+    estrelas = SistemaDEstrelas(LARGURA, ALTURA)
+    return nave, inimigos, nave_mae, projeteis, estrelas
 
 # GameLoop
 def main():
     # Definindo Objetos
-    nave, inimigos, nave_mae, projeteis = criar_jogo()
+    nave, inimigos, nave_mae, projeteis, estrelas = criar_jogo()
 
     # Definindo estado inicial do jogo
     estado = Estados.ESTADO_JOGANDO
@@ -53,7 +54,7 @@ def main():
                 exit()
             if event.type == KEYDOWN:
                 if event.key == K_r and estado != Estados.ESTADO_JOGANDO:
-                    nave, inimigos, nave_mae, projeteis = criar_jogo()
+                    nave, inimigos, nave_mae, projeteis, estrelas = criar_jogo()
                     estado = Estados.ESTADO_JOGANDO
 
         # ---------- INPUT CONTÍNUO ----------
@@ -75,7 +76,7 @@ def main():
         # --------- ATUALIZANDO ----------------
         if estado == Estados.ESTADO_JOGANDO:
             nave.atualizar()
-
+            estrelas.atualizar()
             for p in projeteis[:]:
                 p.atualizar()
                 if p.fora_da_tela():
@@ -127,6 +128,8 @@ def main():
             nave_mae.desenhar(TELA)
 
             nave.desenhar(TELA)
+
+            estrelas.desenhar(TELA)
                 
             desenhar_hud(fonte_hub, TELA, nave)
             pygame.display.flip()
