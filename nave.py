@@ -32,7 +32,7 @@ class Nave:
         """
         M_escala   = matriz_escala(self.escala, self.escala)
         M_rotacao  = matriz_rotacao(self.angulo)
-        M_reflexao = matriz_reflexao("y") if self.refletida else np.eye(3)
+        M_reflexao = matriz_reflexao("y") @ matriz_reflexao("x") if self.refletida else np.eye(3)
         M_trans    = matriz_translacao(self.x, self.y)
 
         # Composição: aplica da direita para a esquerda
@@ -50,6 +50,7 @@ class Nave:
         dy = cos(a) * self.VELOCIDADE
         self.x = (self.x + dx) % LARGURA   # wrap de tela
         self.y = (self.y - dy) % ALTURA
+        self.refletida = False
 
     def mover_tras(self):
         a = radians(self.angulo)
@@ -57,6 +58,7 @@ class Nave:
         dy = -cos(a) * self.VELOCIDADE
         self.x = (self.x + dx) % LARGURA
         self.y = (self.y - dy) % ALTURA
+        self.refletida = True
 
     def atirar(self):
         if self._cooldown <= 0:
