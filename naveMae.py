@@ -5,6 +5,7 @@ from transformacoes import *
 
 class NaveMae:
     COUNTDOWN_INIMIGO = 100
+    VELOCIDADE = 2
 
     def __init__(self, x, y):
         self.x = x
@@ -34,7 +35,7 @@ class NaveMae:
             self._cooldown = self.COUNTDOWN_INIMIGO
         
         # Movimentação da nave
-        self.x += 1 * self.direcao
+        self.x += self.VELOCIDADE * self.direcao
         if self.x >= LARGURA - 50 or self.x <= 50:
             self.direcao *= -1
 
