@@ -1,4 +1,4 @@
-from config import desenhar_poligono
+from config import LARGURA, desenhar_poligono
 from coresEnum import Cores
 from formasEnum import Formas
 from transformacoes import *
@@ -16,6 +16,7 @@ class NaveMae:
         self._sentido_escala = 1
         self._cooldown = 0
         self.novo_inimigo = False
+        self.direcao = 1
 
     def pontos_transformados(self):
         M = (matriz_translacao(self.x, self.y) @
@@ -32,13 +33,15 @@ class NaveMae:
             self.novo_inimigo = True
             self._cooldown = self.COUNTDOWN_INIMIGO
         
+        # Movimentação da nave
+        self.x += 1 * self.direcao
+        if self.x >= LARGURA - 50 or self.x <= 50:
+            self.direcao *= -1
 
         # Pulsação de escala — demonstra escala dinâmica
         self.escala += 0.005 * self._sentido_escala
         if self.escala >= 1.4 or self.escala <= 0.8:
             self._sentido_escala *= -1
-
-        
     
     def colidiu_com(self, px, py, raio=45):
         dist = ((self.x - px)**2 + (self.y - py)**2) ** 0.5

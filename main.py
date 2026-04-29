@@ -77,6 +77,12 @@ def main():
                 if p.fora_da_tela():
                     projeteis.remove(p)
                     continue
+                
+                # colisão de projetil com nave mae
+                if nave_mae.viva and nave_mae.colidiu_com(p.x, p.y):
+                    nave_mae.receber_dano()
+                    projeteis.remove(p)
+                    continue
 
                 #colisão de projétil com inimigo
                 for inimigo in inimigos[:]:
@@ -92,7 +98,8 @@ def main():
                     nave.vidas -= 1
                     inimigos.remove(inimigo)
                     break
-
+            
+            # Nave mãe produz inimigos
             nave_mae.atualizar()
             if nave_mae.novo_inimigo:
                 inimigos.append(NaveInimiga(nave_mae.x, nave_mae.y))
