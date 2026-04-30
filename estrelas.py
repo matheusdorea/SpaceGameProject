@@ -5,7 +5,7 @@ import random
 
 class SistemaDEstrelas:
     NUM_ESTRELAS = 150
-    ESCALA = 300  # distância "focal" das estrelas
+    ESCALA = 400  # distância "focal" das estrelas
 
     def __init__(self, largura, altura):
         self.largura = largura

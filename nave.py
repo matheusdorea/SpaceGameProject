@@ -44,6 +44,9 @@ class Nave:
         """direcao: +1 (horário) ou -1 (anti-horário)."""
         self.angulo += direcao * self.VEL_ROTACAO
 
+        # mantém o angulo entre 0 e 360
+        self.angulo %= 360
+
     def mover_frente(self):
         a = radians(self.angulo)
         dx = sin(a) * self.VELOCIDADE
