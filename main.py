@@ -18,7 +18,7 @@ pygame.init()
 
 # Definindo tamanho da tela
 TELA = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("Space Defender")
+pygame.display.set_caption("Space Game")
 
 #definindo fps
 clock = pygame.time.Clock()
